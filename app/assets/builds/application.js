@@ -48994,8 +48994,7 @@ var CadastroPacote = () => {
     nome: "",
     planoId: "",
     servicosAdicionais: [],
-    valor: 0,
-    maoDeObra: 0
+    valor: 0
   });
   const [planos, setPlanos] = (0, import_react14.useState)([]);
   const [servicos, setServicos] = (0, import_react14.useState)([]);
@@ -49004,6 +49003,15 @@ var CadastroPacote = () => {
     axios_default.get("http://localhost:5000/planos").then((response) => setPlanos(response.data));
     axios_default.get("http://localhost:5000/servicos").then((response) => setServicos(response.data));
   }, []);
+  const limparCampos = () => {
+    setPacote({
+      nome: "",
+      planoId: "",
+      servicosAdicionais: [],
+      valor: 0
+    });
+    setErro("");
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPacote((prevState) => ({
@@ -49031,8 +49039,7 @@ var CadastroPacote = () => {
     console.log("Dados enviados:", dados);
     axios_default.post("http://localhost:5000/pacotes", { pacote: dados }).then((response) => {
       alert("Pacote cadastrado com sucesso!");
-      setPacote({ nome: "", planoId: "", servicosAdicionais: [], valor: 0 });
-      setErro("");
+      limparCampos();
     }).catch(() => setErro("Erro ao cadastrar pacote."));
   };
   const renderSelectedServicos = (selected) => {
@@ -49163,6 +49170,13 @@ var SubscriptionForm = () => {
   const [pkg, setPkg] = (0, import_react18.useState)(null);
   const [selectedServices, setSelectedServices] = (0, import_react18.useState)([]);
   const [availableServices, setAvailableServices] = (0, import_react18.useState)([]);
+  const limparCampos = () => {
+    setClient(null);
+    setPlan(null);
+    setPkg(null);
+    setSelectedServices([]);
+    setAvailableServices([]);
+  };
   const handleSubmit = async () => {
     if (client && (plan || pkg)) {
       const data2 = {
@@ -49182,6 +49196,7 @@ var SubscriptionForm = () => {
         });
         if (response.status === 201) {
           alert("Assinatura realizada com sucesso!");
+          limparCampos();
         }
       } catch (error) {
         console.error("Erro ao realizar assinatura:", error);
@@ -49194,7 +49209,7 @@ var SubscriptionForm = () => {
       alert("Por favor selecione o cliente, o plano ou pacote para a realiza\xE7\xE3o da assinatura.");
     }
   };
-  return /* @__PURE__ */ import_react18.default.createElement(Container_default, { maxWidth: "md", style: { marginTop: "20px" } }, /* @__PURE__ */ import_react18.default.createElement(Paper_default, { elevation: 3, style: { padding: "20px", backgroundColor: "#f5f5f5" } }, /* @__PURE__ */ import_react18.default.createElement(Typography_default, { variant: "h4", gutterBottom: true, style: { color: "#3f51b5", fontWeight: "bold" } }, "Formul\xE1rio para Realiza\xE7\xE3o de Assinatura"), /* @__PURE__ */ import_react18.default.createElement(ClienteSeletor_default, { setClient }), client && /* @__PURE__ */ import_react18.default.createElement(import_react18.default.Fragment, null, /* @__PURE__ */ import_react18.default.createElement(
+  return /* @__PURE__ */ import_react18.default.createElement(Container_default, { maxWidth: "md", sx: { marginTop: "40px", marginBottom: "40px" } }, /* @__PURE__ */ import_react18.default.createElement(Paper_default, { elevation: 3, sx: { padding: "30px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)" } }, /* @__PURE__ */ import_react18.default.createElement(Typography_default, { variant: "h4", gutterBottom: true, sx: { color: "#3f51b5", fontWeight: "bold", textAlign: "center", marginBottom: "30px" } }, "Formul\xE1rio para Realiza\xE7\xE3o de Assinatura"), /* @__PURE__ */ import_react18.default.createElement(Grid_default, { container: true, spacing: 3 }, /* @__PURE__ */ import_react18.default.createElement(Grid_default, { item: true, xs: 12 }, /* @__PURE__ */ import_react18.default.createElement(Card_default, { sx: { borderRadius: "8px", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" } }, /* @__PURE__ */ import_react18.default.createElement(CardContent_default, null, /* @__PURE__ */ import_react18.default.createElement(Typography_default, { variant: "h6", sx: { color: "#3f51b5", fontWeight: "bold", marginBottom: "20px" } }, "Selecione o Cliente"), /* @__PURE__ */ import_react18.default.createElement(ClienteSeletor_default, { setClient })))), client && /* @__PURE__ */ import_react18.default.createElement(import_react18.default.Fragment, null, /* @__PURE__ */ import_react18.default.createElement(Grid_default, { item: true, xs: 12 }, /* @__PURE__ */ import_react18.default.createElement(Card_default, { sx: { borderRadius: "8px", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" } }, /* @__PURE__ */ import_react18.default.createElement(CardContent_default, null, /* @__PURE__ */ import_react18.default.createElement(Typography_default, { variant: "h6", sx: { color: "#3f51b5", fontWeight: "bold", marginBottom: "20px" } }, "Selecione o Plano ou Pacote"), /* @__PURE__ */ import_react18.default.createElement(
     PlanoSeletor_default,
     {
       clientId: client,
@@ -49202,22 +49217,29 @@ var SubscriptionForm = () => {
       setPackage: setPkg,
       setAvailableServices
     }
-  ), (plan || pkg) && /* @__PURE__ */ import_react18.default.createElement(
+  )))), (plan || pkg) && /* @__PURE__ */ import_react18.default.createElement(Grid_default, { item: true, xs: 12 }, /* @__PURE__ */ import_react18.default.createElement(Card_default, { sx: { borderRadius: "8px", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" } }, /* @__PURE__ */ import_react18.default.createElement(CardContent_default, null, /* @__PURE__ */ import_react18.default.createElement(Typography_default, { variant: "h6", sx: { color: "#3f51b5", fontWeight: "bold", marginBottom: "20px" } }, "Servi\xE7os Adicionais"), /* @__PURE__ */ import_react18.default.createElement(
     servicosAdicionais_default,
     {
       availableServices,
       setSelectedServices
     }
-  ), /* @__PURE__ */ import_react18.default.createElement(
+  )))), /* @__PURE__ */ import_react18.default.createElement(Grid_default, { item: true, xs: 12, sx: { display: "flex", justifyContent: "center", marginTop: "20px" } }, /* @__PURE__ */ import_react18.default.createElement(
     Button_default,
     {
       variant: "contained",
       color: "primary",
       onClick: handleSubmit,
-      style: { marginTop: "20px", backgroundColor: "#3f51b5", fontWeight: "bold" }
+      sx: {
+        backgroundColor: "#3f51b5",
+        "&:hover": { backgroundColor: "#303f9f" },
+        padding: "10px 30px",
+        borderRadius: "8px",
+        fontWeight: "bold",
+        fontSize: "16px"
+      }
     },
     "Realizar Assinatura"
-  ))));
+  ))))));
 };
 var inscreverAssinatura_default = SubscriptionForm;
 
@@ -49270,7 +49292,6 @@ var FaturamentoCli = () => {
     setFaturamentoMensal(meses.map((valor, index) => ({
       valor,
       vencimento: vencimentos[index]
-      // Data de vencimento
     })));
     setTotalAnual(meses.reduce((total, valor) => total + valor, 0));
   };
@@ -49287,20 +49308,27 @@ var FaturamentoCli = () => {
   (0, import_react19.useEffect)(() => {
     buscarClientes();
   }, []);
-  return /* @__PURE__ */ import_react19.default.createElement(Box_default, { sx: { padding: 3 } }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h5" }, "Faturamento"), /* @__PURE__ */ import_react19.default.createElement(Grid_default, { container: true, spacing: 2, sx: { marginBottom: 2 } }, /* @__PURE__ */ import_react19.default.createElement(Grid_default, { item: true, xs: 12 }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h6" }, "Selecione o Cliente")), clientes.map((cliente) => /* @__PURE__ */ import_react19.default.createElement(Grid_default, { item: true, xs: 12, sm: 6, md: 4, key: cliente.id }, /* @__PURE__ */ import_react19.default.createElement(
+  return /* @__PURE__ */ import_react19.default.createElement(Container_default, { maxWidth: "lg", sx: { padding: 3 } }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h4", gutterBottom: true, sx: { color: "#3f51b5", fontWeight: "bold", marginBottom: 4 } }, "Faturamento de Clientes"), /* @__PURE__ */ import_react19.default.createElement(Grid_default, { container: true, spacing: 3, sx: { marginBottom: 4 } }, /* @__PURE__ */ import_react19.default.createElement(Grid_default, { item: true, xs: 12 }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h6", sx: { color: "#757575", marginBottom: 2 } }, "Selecione o Cliente")), clientes.map((cliente) => /* @__PURE__ */ import_react19.default.createElement(Grid_default, { item: true, xs: 12, sm: 6, md: 4, key: cliente.id }, /* @__PURE__ */ import_react19.default.createElement(
     Button_default,
     {
       variant: "contained",
       onClick: () => handleClienteSelect(cliente.id),
-      fullWidth: true
+      fullWidth: true,
+      sx: {
+        backgroundColor: "#3f51b5",
+        "&:hover": { backgroundColor: "#303f9f" },
+        padding: 2,
+        borderRadius: 2,
+        fontWeight: "bold"
+      }
     },
     cliente.nome
-  )))), clienteSelecionado && assinaturas.length > 0 && /* @__PURE__ */ import_react19.default.createElement(Box_default, { sx: { marginTop: 3 } }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h6" }, "Assinaturas de ", clientes.find((c) => c.id === clienteSelecionado)?.nome), assinaturas.map((assinatura) => {
+  )))), clienteSelecionado && assinaturas.length > 0 && /* @__PURE__ */ import_react19.default.createElement(Box_default, { sx: { marginTop: 4 } }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h5", sx: { color: "#3f51b5", fontWeight: "bold", marginBottom: 3 } }, "Assinaturas de ", clientes.find((c) => c.id === clienteSelecionado)?.nome), assinaturas.map((assinatura) => {
     const nomeAssinatura = assinatura.plano_id ? assinatura.plano?.nome : assinatura.pacote_id ? assinatura.pacote?.nome : "Sem plano/pacote";
     const dataAssinatura = new Date(assinatura.created_at);
     const dataVencimento = calcularDataVencimento(dataAssinatura);
-    return /* @__PURE__ */ import_react19.default.createElement(Box_default, { key: assinatura.id, sx: { marginBottom: 3 } }, /* @__PURE__ */ import_react19.default.createElement(Card_default, null, /* @__PURE__ */ import_react19.default.createElement(CardContent_default, null, /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Nome da Assinatura:"), " ", nomeAssinatura), /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Data de Assinatura:"), " ", dataAssinatura.toLocaleDateString("pt-BR")), /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Data de Vencimento:"), " ", dataVencimento.toLocaleDateString("pt-BR")), assinatura.pacote_id && /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Pacote:"), " ", assinatura.pacote?.nome, " (R$", assinatura.pacote?.valor, ")"), assinatura.plano_id && /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Plano:"), " ", assinatura.plano?.nome, " (R$", assinatura.plano?.valor, ")"), assinatura.pacote?.plano && /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Plano do Pacote:"), " ", assinatura.pacote.plano.nome, " (R$", assinatura.pacote.plano.valor, ")"), /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "body2", sx: { marginTop: 2 } }, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Servi\xE7os Adicionais:"), /* @__PURE__ */ import_react19.default.createElement("ul", null, assinatura.servicos_adicionais?.map((servico) => /* @__PURE__ */ import_react19.default.createElement("li", { key: servico.id }, servico.nome, " (R$", servico.valor, ")")))), /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h6", sx: { marginTop: 2 } }, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Valor Total:"), " R$", calcularValorTotal(assinatura).toFixed(2)))));
-  })), clienteSelecionado && assinaturas.length === 0 && /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "body1" }, "Nenhuma assinatura encontrada para este cliente."), clienteSelecionado && /* @__PURE__ */ import_react19.default.createElement(Box_default, { sx: { marginTop: 5 } }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h5" }, "Faturamento Mensal e Total Anual"), /* @__PURE__ */ import_react19.default.createElement(TableContainer_default, { component: Paper_default, sx: { marginTop: 2 } }, /* @__PURE__ */ import_react19.default.createElement(Table_default, null, /* @__PURE__ */ import_react19.default.createElement(TableHead_default, null, /* @__PURE__ */ import_react19.default.createElement(TableRow_default, null, /* @__PURE__ */ import_react19.default.createElement(TableCell_default, null, "M\xEAs"), /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { align: "right" }, "Data de Vencimento"), /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { align: "right" }, "Valor (R$)"))), /* @__PURE__ */ import_react19.default.createElement(TableBody_default, null, faturamentoMensal.map((fatura, index) => /* @__PURE__ */ import_react19.default.createElement(TableRow_default, { key: index }, /* @__PURE__ */ import_react19.default.createElement(TableCell_default, null, new Date(2023, index).toLocaleString("default", { month: "long" })), /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { align: "right" }, fatura.vencimento ? fatura.vencimento.toLocaleDateString("pt-BR") : "N/A"), /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { align: "right" }, fatura.valor.toFixed(2))))))), /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h6", sx: { marginTop: 2 } }, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Total Anual:"), " R$", totalAnual.toFixed(2))));
+    return /* @__PURE__ */ import_react19.default.createElement(Box_default, { key: assinatura.id, sx: { marginBottom: 3 } }, /* @__PURE__ */ import_react19.default.createElement(Card_default, { sx: { borderRadius: 2, boxShadow: 3 } }, /* @__PURE__ */ import_react19.default.createElement(CardContent_default, null, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h6", sx: { color: "#3f51b5", fontWeight: "bold", marginBottom: 2 } }, nomeAssinatura), /* @__PURE__ */ import_react19.default.createElement(Grid_default, { container: true, spacing: 2 }, /* @__PURE__ */ import_react19.default.createElement(Grid_default, { item: true, xs: 12, md: 6 }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Data de Assinatura:"), " ", dataAssinatura.toLocaleDateString("pt-BR")), /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Data de Vencimento:"), " ", dataVencimento.toLocaleDateString("pt-BR"))), /* @__PURE__ */ import_react19.default.createElement(Grid_default, { item: true, xs: 12, md: 6 }, assinatura.pacote_id && /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Pacote:"), " ", assinatura.pacote?.nome, " (R$", assinatura.pacote?.valor, ")"), assinatura.plano_id && /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Plano:"), " ", assinatura.plano?.nome, " (R$", assinatura.plano?.valor, ")"), assinatura.pacote?.plano && /* @__PURE__ */ import_react19.default.createElement(Typography_default, null, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Plano do Pacote:"), " ", assinatura.pacote.plano.nome, " (R$", assinatura.pacote.plano.valor, ")"))), /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "body2", sx: { marginTop: 2 } }, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Servi\xE7os Adicionais:"), /* @__PURE__ */ import_react19.default.createElement("ul", null, assinatura.servicos_adicionais?.map((servico) => /* @__PURE__ */ import_react19.default.createElement("li", { key: servico.id }, servico.nome, " (R$", servico.valor, ")")))), /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h6", sx: { marginTop: 2, color: "#4caf50", fontWeight: "bold" } }, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Valor Total:"), " R$", calcularValorTotal(assinatura).toFixed(2)))));
+  })), clienteSelecionado && assinaturas.length === 0 && /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "body1", sx: { color: "#757575", marginTop: 3 } }, "Nenhuma assinatura encontrada para este cliente."), clienteSelecionado && /* @__PURE__ */ import_react19.default.createElement(Box_default, { sx: { marginTop: 6 } }, /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h5", sx: { color: "#3f51b5", fontWeight: "bold", marginBottom: 3 } }, "Faturamento Mensal e Total Anual"), /* @__PURE__ */ import_react19.default.createElement(TableContainer_default, { component: Paper_default, sx: { borderRadius: 2, boxShadow: 3 } }, /* @__PURE__ */ import_react19.default.createElement(Table_default, null, /* @__PURE__ */ import_react19.default.createElement(TableHead_default, null, /* @__PURE__ */ import_react19.default.createElement(TableRow_default, null, /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { sx: { fontWeight: "bold", color: "#3f51b5" } }, "M\xEAs"), /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { align: "right", sx: { fontWeight: "bold", color: "#3f51b5" } }, "Data de Vencimento"), /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { align: "right", sx: { fontWeight: "bold", color: "#3f51b5" } }, "Valor (R$)"))), /* @__PURE__ */ import_react19.default.createElement(TableBody_default, null, faturamentoMensal.map((fatura, index) => /* @__PURE__ */ import_react19.default.createElement(TableRow_default, { key: index }, /* @__PURE__ */ import_react19.default.createElement(TableCell_default, null, new Date(2023, index).toLocaleString("default", { month: "long" })), /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { align: "right" }, fatura.vencimento ? fatura.vencimento.toLocaleDateString("pt-BR") : "N/A"), /* @__PURE__ */ import_react19.default.createElement(TableCell_default, { align: "right" }, fatura.valor.toFixed(2))))))), /* @__PURE__ */ import_react19.default.createElement(Typography_default, { variant: "h6", sx: { marginTop: 3, color: "#4caf50", fontWeight: "bold" } }, /* @__PURE__ */ import_react19.default.createElement("strong", null, "Total Anual:"), " R$", totalAnual.toFixed(2))));
 };
 var FaturamentoCli_default = FaturamentoCli;
 

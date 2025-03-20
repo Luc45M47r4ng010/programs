@@ -21,7 +21,6 @@ const CadastroPacote = () => {
     planoId: '',
     servicosAdicionais: [],
     valor: 0,
-    maoDeObra: 0
   });
   const [planos, setPlanos] = useState([]);
   const [servicos, setServicos] = useState([]);
@@ -31,6 +30,17 @@ const CadastroPacote = () => {
     axios.get('http://localhost:5000/planos').then(response => setPlanos(response.data));
     axios.get('http://localhost:5000/servicos').then(response => setServicos(response.data));
   }, []);
+
+  // Função para limpar todos os campos
+  const limparCampos = () => {
+    setPacote({
+      nome: '',
+      planoId: '',
+      servicosAdicionais: [],
+      valor: 0,
+    });
+    setErro('');
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,8 +72,7 @@ const CadastroPacote = () => {
     axios.post('http://localhost:5000/pacotes', { pacote: dados })
       .then(response => {
         alert('Pacote cadastrado com sucesso!');
-        setPacote({ nome: '', planoId: '', servicosAdicionais: [], valor: 0 });
-        setErro('');
+        limparCampos(); // Limpa os campos após o envio bem-sucedido
       })
       .catch(() => setErro('Erro ao cadastrar pacote.'));
   };

@@ -1,100 +1,94 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Grid, Typography, Box, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Button, Grid, Typography, Box, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container } from '@mui/material';
 import axios from 'axios';
 
 const FaturamentoCli = () => {
   const [clientes, setClientes] = useState([]);
   const [assinaturas, setAssinaturas] = useState([]);
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
-  const [faturamentoMensal, setFaturamentoMensal] = useState([]); // Faturamento mensal
-  const [totalAnual, setTotalAnual] = useState(0); // Total dos 12 meses
+  const [faturamentoMensal, setFaturamentoMensal] = useState([]);
+  const [totalAnual, setTotalAnual] = useState(0);
 
-  // Função para buscar clientes (para popular a lista de clientes)
   const buscarClientes = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/clientes'); // Modifique a URL conforme necessário
+      const response = await axios.get('http://localhost:5000/clientes');
       setClientes(response.data);
     } catch (error) {
       console.error('Erro ao buscar clientes:', error);
     }
   };
 
-  // Função para buscar as assinaturas por cliente
   const buscarAssinaturasPorCliente = async (clienteId) => {
     try {
       const response = await axios.get(`http://localhost:5000/assinaturas?cliente_id=${clienteId}`);
       setAssinaturas(response.data);
-      calcularFaturamentoMensal(response.data); // Calcula o faturamento mensal
+      calcularFaturamentoMensal(response.data);
     } catch (error) {
       console.error('Erro ao buscar assinaturas:', error);
     }
   };
 
-  // Função para calcular o valor total da assinatura (plano + pacote + serviços adicionais)
   const calcularValorTotal = (assinatura) => {
-    const valorPlano = assinatura.plano ? parseFloat(assinatura.plano.valor) : 0; // Valor do plano (se existir diretamente na assinatura)
-    const valorPacote = assinatura.pacote ? parseFloat(assinatura.pacote.valor) : 0; // Valor do pacote
-    const valorPlanoDoPacote = assinatura.pacote?.plano ? parseFloat(assinatura.pacote.plano.valor) : 0; // Valor do plano dentro do pacote
-    const valorServicos = assinatura.servicos_adicionais?.reduce((total, servico) => total + parseFloat(servico.valor), 0) || 0; // Valor dos serviços adicionais
+    const valorPlano = assinatura.plano ? parseFloat(assinatura.plano.valor) : 0;
+    const valorPacote = assinatura.pacote ? parseFloat(assinatura.pacote.valor) : 0;
+    const valorPlanoDoPacote = assinatura.pacote?.plano ? parseFloat(assinatura.pacote.plano.valor) : 0;
+    const valorServicos = assinatura.servicos_adicionais?.reduce((total, servico) => total + parseFloat(servico.valor), 0) || 0;
 
-    return valorPlano + valorPacote + valorPlanoDoPacote + valorServicos; // Soma total
+    return valorPlano + valorPacote + valorPlanoDoPacote + valorServicos;
   };
 
-  // Função para calcular o faturamento mensal e o total anual
   const calcularFaturamentoMensal = (assinaturas) => {
-    const meses = Array(12).fill(0); // Inicializa um array com 12 meses (valores zerados)
-    const vencimentos = Array(12).fill(null); // Inicializa um array com as datas de vencimento
+    const meses = Array(12).fill(0);
+    const vencimentos = Array(12).fill(null);
 
     assinaturas.forEach((assinatura) => {
       const dataAssinatura = new Date(assinatura.created_at);
-      const mesInicio = dataAssinatura.getMonth() + 1; // Mês de início (próximo mês)
-      const valorMensal = calcularValorTotal(assinatura); // Valor mensal da assinatura
+      const mesInicio = dataAssinatura.getMonth() + 1;
+      const valorMensal = calcularValorTotal(assinatura);
 
-      // Distribui o valor mensal a partir do próximo mês, garantindo 12 meses
       for (let i = 0; i < 12; i++) {
-        const mes = (mesInicio + i) % 12; // Calcula o mês corretamente (considerando o ciclo de 12 meses)
+        const mes = (mesInicio + i) % 12;
         meses[mes] += valorMensal;
-
-        // Define a data de vencimento (dia 10 do próximo mês)
-        const ano = dataAssinatura.getFullYear() + Math.floor((mesInicio + i) / 12); // Ajusta o ano se necessário
-        vencimentos[mes] = new Date(ano, mes, 10); // Dia 10 do mês
+        const ano = dataAssinatura.getFullYear() + Math.floor((mesInicio + i) / 12);
+        vencimentos[mes] = new Date(ano, mes, 10);
       }
     });
 
     setFaturamentoMensal(meses.map((valor, index) => ({
       valor,
-      vencimento: vencimentos[index], // Data de vencimento
-    }))); // Atualiza o faturamento mensal com valores e datas de vencimento
-    setTotalAnual(meses.reduce((total, valor) => total + valor, 0)); // Calcula o total anual
+      vencimento: vencimentos[index],
+    })));
+    setTotalAnual(meses.reduce((total, valor) => total + valor, 0));
   };
 
-  // Função para calcular a data de vencimento (dia 10 do próximo mês)
   const calcularDataVencimento = (dataAssinatura) => {
     const proximoMes = new Date(dataAssinatura);
-    proximoMes.setMonth(proximoMes.getMonth() + 1); // Próximo mês
-    proximoMes.setDate(10); // Dia 10 do próximo mês
+    proximoMes.setMonth(proximoMes.getMonth() + 1);
+    proximoMes.setDate(10);
     return proximoMes;
   };
 
-  // Função para tratar a seleção de um cliente
   const handleClienteSelect = (clienteId) => {
     setClienteSelecionado(clienteId);
     buscarAssinaturasPorCliente(clienteId);
   };
 
-  // Carregar clientes ao inicializar o componente
   useEffect(() => {
     buscarClientes();
   }, []);
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h5">Faturamento</Typography>
+    <Container maxWidth="lg" sx={{ padding: 3 }}>
+      <Typography variant="h4" gutterBottom sx={{ color: '#3f51b5', fontWeight: 'bold', marginBottom: 4 }}>
+        Faturamento de Clientes
+      </Typography>
 
       {/* Lista de Clientes */}
-      <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+      <Grid container spacing={3} sx={{ marginBottom: 4 }}>
         <Grid item xs={12}>
-          <Typography variant="h6">Selecione o Cliente</Typography>
+          <Typography variant="h6" sx={{ color: '#757575', marginBottom: 2 }}>
+            Selecione o Cliente
+          </Typography>
         </Grid>
         {clientes.map((cliente) => (
           <Grid item xs={12} sm={6} md={4} key={cliente.id}>
@@ -102,6 +96,13 @@ const FaturamentoCli = () => {
               variant="contained"
               onClick={() => handleClienteSelect(cliente.id)}
               fullWidth
+              sx={{
+                backgroundColor: '#3f51b5',
+                '&:hover': { backgroundColor: '#303f9f' },
+                padding: 2,
+                borderRadius: 2,
+                fontWeight: 'bold',
+              }}
             >
               {cliente.nome}
             </Button>
@@ -111,59 +112,56 @@ const FaturamentoCli = () => {
 
       {/* Exibição das Assinaturas do Cliente Selecionado */}
       {clienteSelecionado && assinaturas.length > 0 && (
-        <Box sx={{ marginTop: 3 }}>
-          <Typography variant="h6">Assinaturas de {clientes.find(c => c.id === clienteSelecionado)?.nome}</Typography>
+        <Box sx={{ marginTop: 4 }}>
+          <Typography variant="h5" sx={{ color: '#3f51b5', fontWeight: 'bold', marginBottom: 3 }}>
+            Assinaturas de {clientes.find(c => c.id === clienteSelecionado)?.nome}
+          </Typography>
 
           {assinaturas.map((assinatura) => {
-            // Verifica se o pacote ou o plano existe e define o nome
-            const nomeAssinatura = assinatura.plano_id 
-              ? assinatura.plano?.nome 
-              : assinatura.pacote_id 
-              ? assinatura.pacote?.nome 
+            const nomeAssinatura = assinatura.plano_id
+              ? assinatura.plano?.nome
+              : assinatura.pacote_id
+              ? assinatura.pacote?.nome
               : 'Sem plano/pacote';
 
-            // Calcula a data de vencimento (dia 10 do próximo mês)
             const dataAssinatura = new Date(assinatura.created_at);
             const dataVencimento = calcularDataVencimento(dataAssinatura);
 
             return (
               <Box key={assinatura.id} sx={{ marginBottom: 3 }}>
-                <Card>
+                <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
                   <CardContent>
-                    <Typography>
-                      <strong>Nome da Assinatura:</strong> {nomeAssinatura}
+                    <Typography variant="h6" sx={{ color: '#3f51b5', fontWeight: 'bold', marginBottom: 2 }}>
+                      {nomeAssinatura}
                     </Typography>
 
-                    {/* Exibição da data de assinatura */}
-                    <Typography>
-                      <strong>Data de Assinatura:</strong> {dataAssinatura.toLocaleDateString('pt-BR')}
-                    </Typography>
-
-                    {/* Exibição da data de vencimento */}
-                    <Typography>
-                      <strong>Data de Vencimento:</strong> {dataVencimento.toLocaleDateString('pt-BR')}
-                    </Typography>
-
-                    {/* Exibição do pacote */}
-                    {assinatura.pacote_id && (
-                      <Typography>
-                        <strong>Pacote:</strong> {assinatura.pacote?.nome} (R${assinatura.pacote?.valor})
-                      </Typography>
-                    )}
-
-                    {/* Exibição do plano */}
-                    {assinatura.plano_id && (
-                      <Typography>
-                        <strong>Plano:</strong> {assinatura.plano?.nome} (R${assinatura.plano?.valor})
-                      </Typography>
-                    )}
-
-                    {/* Exibição do plano dentro do pacote */}
-                    {assinatura.pacote?.plano && (
-                      <Typography>
-                        <strong>Plano do Pacote:</strong> {assinatura.pacote.plano.nome} (R${assinatura.pacote.plano.valor})
-                      </Typography>
-                    )}
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography>
+                          <strong>Data de Assinatura:</strong> {dataAssinatura.toLocaleDateString('pt-BR')}
+                        </Typography>
+                        <Typography>
+                          <strong>Data de Vencimento:</strong> {dataVencimento.toLocaleDateString('pt-BR')}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        {assinatura.pacote_id && (
+                          <Typography>
+                            <strong>Pacote:</strong> {assinatura.pacote?.nome} (R${assinatura.pacote?.valor})
+                          </Typography>
+                        )}
+                        {assinatura.plano_id && (
+                          <Typography>
+                            <strong>Plano:</strong> {assinatura.plano?.nome} (R${assinatura.plano?.valor})
+                          </Typography>
+                        )}
+                        {assinatura.pacote?.plano && (
+                          <Typography>
+                            <strong>Plano do Pacote:</strong> {assinatura.pacote.plano.nome} (R${assinatura.pacote.plano.valor})
+                          </Typography>
+                        )}
+                      </Grid>
+                    </Grid>
 
                     <Typography variant="body2" sx={{ marginTop: 2 }}>
                       <strong>Serviços Adicionais:</strong>
@@ -176,10 +174,8 @@ const FaturamentoCli = () => {
                       </ul>
                     </Typography>
 
-                    {/* Exibição do valor total da assinatura */}
-                    <Typography variant="h6" sx={{ marginTop: 2 }}>
-                      <strong>Valor Total:</strong> R$
-                      {calcularValorTotal(assinatura).toFixed(2)}
+                    <Typography variant="h6" sx={{ marginTop: 2, color: '#4caf50', fontWeight: 'bold' }}>
+                      <strong>Valor Total:</strong> R${calcularValorTotal(assinatura).toFixed(2)}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -191,22 +187,25 @@ const FaturamentoCli = () => {
 
       {/* Caso não haja assinaturas */}
       {clienteSelecionado && assinaturas.length === 0 && (
-        <Typography variant="body1">Nenhuma assinatura encontrada para este cliente.</Typography>
+        <Typography variant="body1" sx={{ color: '#757575', marginTop: 3 }}>
+          Nenhuma assinatura encontrada para este cliente.
+        </Typography>
       )}
 
-      {/* Nova Aba: Faturamento Mensal e Total Anual */}
+      {/* Faturamento Mensal e Total Anual */}
       {clienteSelecionado && (
-        <Box sx={{ marginTop: 5 }}>
-          <Typography variant="h5">Faturamento Mensal e Total Anual</Typography>
+        <Box sx={{ marginTop: 6 }}>
+          <Typography variant="h5" sx={{ color: '#3f51b5', fontWeight: 'bold', marginBottom: 3 }}>
+            Faturamento Mensal e Total Anual
+          </Typography>
 
-          {/* Tabela de Faturamento Mensal */}
-          <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+          <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Mês</TableCell>
-                  <TableCell align="right">Data de Vencimento</TableCell>
-                  <TableCell align="right">Valor (R$)</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', color: '#3f51b5' }}>Mês</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 'bold', color: '#3f51b5' }}>Data de Vencimento</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 'bold', color: '#3f51b5' }}>Valor (R$)</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -223,13 +222,12 @@ const FaturamentoCli = () => {
             </Table>
           </TableContainer>
 
-          {/* Total Anual */}
-          <Typography variant="h6" sx={{ marginTop: 2 }}>
+          <Typography variant="h6" sx={{ marginTop: 3, color: '#4caf50', fontWeight: 'bold' }}>
             <strong>Total Anual:</strong> R${totalAnual.toFixed(2)}
           </Typography>
         </Box>
       )}
-    </Box>
+    </Container>
   );
 };
 
